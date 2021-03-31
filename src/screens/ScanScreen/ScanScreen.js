@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import {firebase} from "../../firebase/config";
-
+import {firebase} from '../../firebase/config';
+import Statuses from '../../Statuses';
 export default function BarcodeScanner(props) {
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
@@ -42,7 +42,21 @@ export default function BarcodeScanner(props) {
 
     const handleBarCodeScanned = ({ type, data }) => {
         setScanned(true);
-        alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        // console.log(Statuses.status);
+      // entities.map( (entity, i ) => console.log())
+        let courierPackages = entities.map(i => i.packages.map(j => {
+            console.log("j.id", j.id);
+            console.log("data", data);
+            console.log("i", i);
+        // }
+            if (j.id === data){
+            alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+
+            console.log(entityRef.doc(i.id));
+                entityRef.doc(i.id).update({
+                    status: i.status + 1 })
+            } else alert(`Pakuotė nerasta!`);
+        }));
     };
 
     if (hasPermission === null) {
