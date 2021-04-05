@@ -1,10 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView, View, VirtualizedList, StyleSheet, Text, StatusBar } from 'react-native';
 import styles from './styles';
 import { firebase } from '../../firebase/config';
 
+
 export default function PickupScreen(props) {
 
+    const getItem = (data, index) => ({
+        id: Math.random().toString(12).substring(0),
+        number: data[index].number,
+        receiverAddress: data[index].receiverAddress,
+        status: data[index].status,
+    });
+
+    const getItemCount = (data) => data.length;
+
+    const Item = ({ number, receiverAddress, status }) => (
+        <View style={styles.item}>
+            <Text style={styles.title}>Siuntos numeris {number}</Text>
+            <Text style={styles.title}>Siuntėjo adresas {receiverAddress}</Text>
+            <Text style={styles.title}>Statusas {status}</Text>
+        </View>
+    );
     const [entityText, setEntityText] = useState('')
     const [entities, setEntities] = useState([])
 
@@ -13,7 +30,7 @@ export default function PickupScreen(props) {
     useEffect(() => {
         entityRef
             .where("pickupDriver", "==", userID)
-            // .orderBy('createdAt', 'desc')
+            .where("status", "==", 101)
             .onSnapshot(
                 querySnapshot => {
                     const newEntities = []
@@ -30,52 +47,17 @@ export default function PickupScreen(props) {
             )
     }, [])
 
-    // const onAddButtonPress = () => {
-    //     if (entityText && entityText.length > 0) {
-    //         const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-    //         const data = {
-    //             text: entityText,
-    //             authorID: userID,
-    //             createdAt: timestamp,
-    //         };
-    //         entityRef
-    //             .add(data)
-    //             .then(_doc => {
-    //                 setEntityText('')
-    //                 Keyboard.dismiss()
-    //             })
-    //             .catch((error) => {
-    //                 alert(error)
-    //             });
-    //     }
-    // }
-
-    const renderEntity = ({item, index}) => {
-        return (
-            <View style={styles.entityContainer}>
-                <Text style={styles.entityText}>
-                    {item.number}  {item.receiverAddress}
-                </Text>
-            </View>
-        )
-    }
 
     return (
-        // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        //     <Text>PickupScreen Screen!</Text>
-        // </View>
-        <View style={styles.container}>
-            { entities && (
-                <View style={styles.listContainer}>
-                    <FlatList
-                        data={entities}
-                        renderItem={renderEntity}
-                        keyExtractor={(item) => item.id}
-                        removeClippedSubviews={true}
-                    />
-
-                </View>
-            )}
-        </View>
+        <SafeAreaView style={styles.container}>
+            <VirtualizedList
+                data={entities}
+                initialNumToRender={4}
+                renderItem={({ item }) => <Item number={item.number} receiverAddress={item.receiverAddress} status={item.status} />}
+                keyExtractor={item => item.key}
+                getItemCount={getItemCount}
+                getItem={getItem}
+            />
+        </SafeAreaView>
     )
 }

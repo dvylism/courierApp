@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { FlatList, Keyboard, Text, TextInput, TouchableOpacity, View, Button } from 'react-native'
 import styles from './styles';
-import { firebase } from '../../firebase/config';
+// import { firebase } from '../../firebase/config';
+import firebase from 'firebase';
 import { NavigationContainer } from '@react-navigation/native';
 import DeliveryScreen from "../DeliveryScreen/DeliveryScreen";
 import PickupScreen from "../PickupScreen/PickupScreen";
@@ -14,6 +15,10 @@ console.log(props);
 
     return (
         <>
+            <Button
+                title="Atsijungti"
+                onPress={() => firebase.auth().signOut()}
+            />
         <Tab.Navigator
             tabBarOptions={{
                 labelStyle: {fontSize:18},

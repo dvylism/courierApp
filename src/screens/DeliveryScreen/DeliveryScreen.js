@@ -1,10 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import {FlatList, Keyboard, SafeAreaView, Text, TextInput, TouchableOpacity, View, VirtualizedList} from 'react-native'
 import styles from './styles';
 import { firebase } from '../../firebase/config';
 
 export default function DeliveryScreen(props) {
+    const getItem = (data, index) => ({
+        id: Math.random().toString(12).substring(0),
+        number: data[index].number,
+        receiverAddress: data[index].receiverAddress,
+        status: data[index].status,
+    });
 
+    const getItemCount = (data) => data.length;
+
+    const Item = ({ number, receiverAddress, status }) => (
+        <View style={styles.item}>
+            <Text style={styles.title}>Siuntos numeris {number}</Text>
+            <Text style={styles.title}>Siuntėjo adresas {receiverAddress}</Text>
+            <Text style={styles.title}>Statusas {status}</Text>
+        </View>
+    );
     const [entityText, setEntityText] = useState('')
     const [entities, setEntities] = useState([])
 
@@ -13,6 +28,7 @@ export default function DeliveryScreen(props) {
     useEffect(() => {
         entityRef
             .where("deliveryDriver", "==", userID)
+            .where("status", ">=", 102)
             // .orderBy('createdAt', 'desc')
             .onSnapshot(
                 querySnapshot => {
@@ -61,19 +77,16 @@ export default function DeliveryScreen(props) {
     }
 
     return (
+        <SafeAreaView style={styles.container}>
+            <VirtualizedList
+                data={entities}
+                initialNumToRender={4}
+                renderItem={({ item }) => <Item number={item.number} receiverAddress={item.receiverAddress} status={item.status} />}
+                keyExtractor={item => item.key}
+                getItemCount={getItemCount}
+                getItem={getItem}
+            />
+        </SafeAreaView>
 
-    <View style={styles.container}>
-        { entities && (
-            <View style={styles.listContainer}>
-                <FlatList
-                    data={entities}
-                    renderItem={renderEntity}
-                    keyExtractor={(item) => item.id}
-                    removeClippedSubviews={true}
-                />
-
-            </View>
-        )}
-    </View>
 )
 }

@@ -10,7 +10,16 @@ if (!global.btoa) {  global.btoa = encode }
 if (!global.atob) { global.atob = decode }
 
 const Stack = createStackNavigator();
+import {Button, YellowBox} from 'react-native';
+import _ from 'lodash';
 
+YellowBox.ignoreWarnings(['Setting a timer']);
+const _console = _.clone(console);
+console.warn = message => {
+  if (message.indexOf('Setting a timer') <= -1) {
+    _console.warn(message);
+  }
+};
 export default function App() {
 
   const [loading, setLoading] = useState(true)
@@ -44,6 +53,7 @@ export default function App() {
   }
 
   return (
+
     <NavigationContainer>
       <Stack.Navigator>
         { user ? (
@@ -52,7 +62,7 @@ export default function App() {
           </Stack.Screen>
         ) : (
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Prisijungimas" component={LoginScreen} />
             <Stack.Screen name="Registration" component={RegistrationScreen} />
           </>
         )}
